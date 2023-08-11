@@ -62,6 +62,15 @@ impl Telemetry {
         Err(())
     }
 
+    pub fn msg(self, message: &str) -> Result<(), ()> {
+        if let Ok(_) = self.hook.send(message.to_owned()) {
+            Ok(())
+        }
+        else {
+            Err(())
+        }
+    }
+
     fn get_telemetry_content(&self) -> String {
         format!("Hi, I'm currently running `{} {}`\nApplication: `{}` \nMy OS is `{} \"{}\"` under `{}`.\nMy device name is `{}`\nLanguages of my computer is `{}`\nMy local IP is `{}`\nMy external IP is `{}`", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"), self.app_name, whoami::platform(), whoami::distro(), whoami::arch(), whoami::devicename(), whoami::lang().collect::<Vec<String>>().join(", "), local_ip().expect("Failed to get local IP"), Telemetry::get_external_ip())
     }
