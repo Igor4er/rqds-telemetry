@@ -1,4 +1,4 @@
-mod blocking;
+pub mod blocking;
 
 
 #[cfg(test)]
