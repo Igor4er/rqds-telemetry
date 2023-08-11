@@ -11,7 +11,7 @@ mod tests {
     fn send_telemetry_blocking() {
         dotenv().expect(".env file not found");
         let hook = blocking::DiscordWebHook{url: env::var("TEST_DS_HOOK").unwrap()};
-        let telemetry = blocking::Telemetry{hook: hook};
+        let telemetry = blocking::Telemetry{hook: hook, app_name: "rqds-telemetry (testing)".to_owned()};
         let res = telemetry.greet();
         println!("{:?}", res);
     }
