@@ -6,7 +6,7 @@ use regex::Regex;
 use serde_json::json;
 
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 pub struct DiscordWebHook {
     pub url: String,
     pub username: String,
@@ -42,7 +42,7 @@ impl DiscordWebHook {
     }
 }
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 pub struct Telemetry {
     pub hook: DiscordWebHook,
     pub app_name: String,
