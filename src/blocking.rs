@@ -51,7 +51,7 @@ impl Telemetry {
     }
 
     fn get_telemetry_content() -> String {
-        format!("Hi, I'm currently running `{}`\nMy OS is `{} \"{}\"` under `{}`.\nMy device name is `{}`\nLanguages of my computer is `{}`\nMy local IP is `{}`\nMy external IP is `{}`", env!("CARGO_PKG_NAME"), whoami::platform(), whoami::distro(), whoami::arch(), whoami::devicename(), whoami::lang().collect::<Vec<String>>().join(", "), local_ip().expect("Failed to get local IP"), Telemetry::get_external_ip())
+        format!("Hi, I'm currently running `{}`\nMy OS is `{} \"{}\"` under `{}`.\nMy device name is `{}`\nLanguages of my computer is `{}`\nMy local IP is `{}`\nMy external IP is `{}`", env!("CARGO_CRATE_NAME"), whoami::platform(), whoami::distro(), whoami::arch(), whoami::devicename(), whoami::lang().collect::<Vec<String>>().join(", "), local_ip().expect("Failed to get local IP"), Telemetry::get_external_ip())
     }
 
     fn get_external_ip() -> String {
