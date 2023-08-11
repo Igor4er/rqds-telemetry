@@ -39,12 +39,20 @@ impl DiscordWebHook {
 #[derive(Default, Debug)]
 pub struct Telemetry {
     pub hook: DiscordWebHook,
-    pub app_name: String
+    pub app_name: String,
+    pub image_url: String
 }
 
 impl Telemetry {
+    pub fn new(hook: DiscordWebHook, app_name: &str, image_url: Option<&str>) -> Self {
+        let image_url = image_url.unwrap_or("https://l.ig4er.link/rqds-i").to_owned();
+
+        Telemetry{ hook: hook, app_name: app_name.to_owned(), image_url: image_url }
+    }
+
     pub fn greet(self) -> Result<(), ()> {
-        let message = HookMessage::new_with_system_username("https://l.ig4er.link/rqds-i".to_owned(), self.get_telemetry_content());
+
+        let message = HookMessage::new_with_system_username(self.image_url.to_owned(), self.get_telemetry_content());
         if let Ok(_) = self.hook.send(message) {
             return Ok(());
         };
