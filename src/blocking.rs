@@ -4,6 +4,8 @@ use local_ip_address::local_ip;
 use whoami;
 use regex::Regex;
 use serde_json::json;
+use chrono::Utc;
+use chrono::prelude::*;
 
 
 #[derive(Default, Debug, Clone)]
@@ -63,7 +65,10 @@ impl Telemetry {
     }
 
     pub fn msg(self, message: &str) -> Result<(), ()> {
-        if let Ok(_) = self.hook.send(message.to_owned()) {
+        let now = Utc::now().naive_utc();
+        let msg = format!("[{}, {}UTC]: {}", now.weekday(), now.time(), message);
+
+        if let Ok(_) = self.hook.send(msg) {
             Ok(())
         }
         else {
